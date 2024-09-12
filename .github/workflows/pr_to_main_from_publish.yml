@@ -12,7 +12,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Check for existing PR
+        id: check-pr
+        run: |
+          gh pr list --base main --head publish --json number --jq '. | length'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Pull Request
+        if: steps.check-pr.outputs.count == '0'
         run: gh pr create -B main -H publish --title 'Merge publish into main' --body 'Created by GitHub Action'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

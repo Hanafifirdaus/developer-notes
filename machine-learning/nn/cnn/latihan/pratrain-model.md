@@ -8,7 +8,6 @@ description: >-
 
 Deklarasi library yang digunakan untuk pretrain model
 
-````
 ```python
 import numpy as np
 import keras
@@ -21,7 +20,6 @@ import seaborn as sns
 from tensorflow.keras.callbacks import EarlyStopping
 import tensorflow as tf
 ```
-````
 
 Load dataset horses dan human, dataset dibagi menjadi 3 antara lain:
 
@@ -33,7 +31,6 @@ Untuk persentase training-nya dibagi jadi 3, 80% untuk Training, 10% untuk valid
 
 
 
-````
 ```python
 tfds.disable_progress_bar()
 
@@ -48,12 +45,10 @@ print(f"Number of training samples: {train_ds.cardinality()}")
 print(f"Number of validation samples: {validation_ds.cardinality()}")
 print(f"Number of test samples: {test_ds.cardinality()}")
 ```
-````
 
 Menampilkan sample gambar berserta label dalam suatu dataset.\
 Untuk horse dilabelkan dengan angka 0 serta human dilabelkan dalam angka 1.
 
-````
 ```python
 plt.figure(figsize=(10, 10))
 for i, (image, label) in enumerate(train_ds.take(9)):
@@ -62,7 +57,6 @@ for i, (image, label) in enumerate(train_ds.take(9)):
     plt.title(int(label))
     plt.axis("off")
 ```
-````
 
 <figure><img src="../../../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
 
@@ -70,7 +64,6 @@ Selanjutnya resize tinggi lebar image, tinggi lebar image ini perlu sesuai denga
 
 
 
-````
 ```python
 resize_fn = keras.layers.Resizing(150, 150)
 
@@ -78,7 +71,6 @@ train_ds = train_ds.map(lambda x, y: (resize_fn(x), y))
 validation_ds = validation_ds.map(lambda x, y: (resize_fn(x), y))
 test_ds = test_ds.map(lambda x, y: (resize_fn(x), y))
 ```
-````
 
 Selanjutnya image augumentasi, dengan image augumentasi ini diharapkan menambah beberapa variasi image, sehingga model dapat berlatih dengan variasi gambar dengan kondisi berbeda-beda.
 
@@ -86,7 +78,6 @@ Image augumentasina sangat berguna sekali ketika kita memiliki jumlah dataset ya
 
 
 
-````
 ```python
 augmentation_layers = [
     layers.RandomFlip("horizontal"),
@@ -99,12 +90,9 @@ def data_augmentation(x):
         x = layer(x)
     return x
 
-
 train_ds = train_ds.map(lambda x, y: (data_augmentation(x), y))
 ```
-````
 
-````
 ```python
 for images, labels in train_ds.take(1):
     plt.figure(figsize=(10, 10))
@@ -116,7 +104,6 @@ for images, labels in train_ds.take(1):
         plt.title(int(labels[0]))
         plt.axis("off")
 ```
-````
 
 Menampilkan sample hasil augumentasi image
 
@@ -124,7 +111,6 @@ Menampilkan sample hasil augumentasi image
 
 Set batch size serta optimize loading speed ketika pelatihan model berjalan
 
-````
 ```python
 from tensorflow import data as tf_data
 
@@ -134,7 +120,6 @@ train_ds = train_ds.batch(batch_size).prefetch(tf_data.AUTOTUNE).cache()
 validation_ds = validation_ds.batch(batch_size).prefetch(tf_data.AUTOTUNE).cache()
 test_ds = test_ds.batch(batch_size).prefetch(tf_data.AUTOTUNE).cache()
 ```
-````
 
 Selanjutnya load model Xception serta beberapa parameter yang perlu diisi seperti input\_shape dengan value (150, 150, 3) angka 150, 150 berarti proses pelatihan model memilik requirement ukuran image tinggi = 150, lebar = 150, serta 3 mewaliki jenis gambar-nya, untuk value = 3 berarti gambar tersebut jenisinya RGB.
 
@@ -144,7 +129,6 @@ Ada beberpa keriteria lain yang perlu diperhatikan antara lain
   Jika diilustrasikan dalam kehidupan sehari-hari misalnya bayi telah sukses belajar berjalan maka untuk belajar berlari perlu mengerti konsep berjalan dulu yang digunakan untuk belajar berlari dengan hanya menambah speed berjalan dengan lebih cepat.
 * Manambah layer output untuk melatih model dalam mengklasifikasi gambar.
 
-````
 ```python
 base_model = keras.applications.Xception(
     weights="imagenet",  # Load weights pre-trained on ImageNet.
@@ -175,7 +159,6 @@ model = keras.Model(inputs, outputs)
 
 model.summary(show_trainable=True)
 ```
-````
 
 Berikut hasil execute code diatas, menghasilkan parameter model yang akan di training.
 

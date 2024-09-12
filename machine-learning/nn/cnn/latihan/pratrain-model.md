@@ -27,9 +27,7 @@ Load dataset horses dan human, dataset dibagi menjadi 3 antara lain:
 * Validation -> Digunakan ketika proses training berjalan, setiap sekali iterasi setelah training berjalan akan melakukan evaluasi model
 * Test -> Digunakan ketika pelatihan model telah selesai, untuk mengukur akurasi model kembali dalam mengenal object gambar
 
-Untuk persentase training-nya dibagi jadi 3, 80% untuk Training, 10% untuk validasi, 10% untuk test
-
-
+Untuk persentase training-nya dibagi jadi 3, 80% untuk Training, 10% untuk validasi, 10% untuk test.
 
 ```python
 tfds.disable_progress_bar()
@@ -62,8 +60,6 @@ for i, (image, label) in enumerate(train_ds.take(9)):
 
 Selanjutnya resize tinggi lebar image, tinggi lebar image ini perlu sesuai dengan value input shape ketika meracik komponen untuk train model.
 
-
-
 ```python
 resize_fn = keras.layers.Resizing(150, 150)
 
@@ -75,8 +71,6 @@ test_ds = test_ds.map(lambda x, y: (resize_fn(x), y))
 Selanjutnya image augumentasi, dengan image augumentasi ini diharapkan menambah beberapa variasi image, sehingga model dapat berlatih dengan variasi gambar dengan kondisi berbeda-beda.
 
 Image augumentasina sangat berguna sekali ketika kita memiliki jumlah dataset yang sangat sedikit.
-
-
 
 ```python
 augmentation_layers = [

@@ -4,7 +4,7 @@ description: >-
   mengurangi kerja javascript.
 ---
 
-# Toggle Expander di React Tanpa useState
+# Expander Pada React Menggunakan useState
 
 _Toggle expander_ biasanya adalah component yang dibuat untuk membuat konent yang dapat kita tutup (_collapsible_) dan memunculkannya kembali (_expandable_) dengan mengklik suatu toggle. Cara untuk membuat expander tanpa menggunakan state agar dapat mengurangi proses _rerender_ adalah dengan menggunakan useRef. Untuk mempermudah memberikan css kita juga akan menggunakan tailwind.
 
@@ -25,7 +25,6 @@ const ExpandAbleComponent = () => {
 };
 
 export default ExpandAbleComponent;
-
 ```
 
 Selanjutnya kita akan menambahkan suatu toggle yang berfungsi untuk mengubah _checkbox_ menjadi _checked_ atau sebaliknya. Kali ini kita akan membuatnya dalam bentuk element button. Lalu pada _listener_ onClick kita menambahkan ref tadi lalu kita trigger _click_. Dengan begini kita sudah bisa mengubah state checkbox.
@@ -60,7 +59,6 @@ const ExpandAbleComponent = () => {
 };
 
 export default ExpandAbleComponent;
-
 ```
 
 Lalu kita akan menambahkan content yang akan terbuka saat _checkbox_ kita sedang dalam posisi _checked_ dan sebaliknya. Untuk contoh sederhana kita akan menggunakan overflow-hidden agar _content_ tidak terlihat, transition untuk memberikan animasi ketika buka tutup dan min-h-0 untuk state saat tertutup.

@@ -4,7 +4,7 @@ description: >-
   dataset terdiri dari 2 categori dalam 1 dataset, human dan horse.
 ---
 
-# Pratrain Model
+# Pretrain Model
 
 Deklarasi library yang digunakan untuk pretrain model
 
@@ -174,3 +174,53 @@ Berikut hasil execute code diatas, menghasilkan parameter model yang akan di tra
 │ dense_3 (Dense)             │ (None, 2)             │      4,098 │   Y   │
 └─────────────────────────────┴───────────────────────┴────────────┴───────┘
 ```
+
+Setalah setting merancang model untuk di pretrain, langkah selanjutnya, membuat beberapa fungsi untuk mengevaluasi model serta untuk menghentikan proses train model dengan ketentuan yang dibuat, fungsi tersebut memiliki tujuan mencegah overfitting serta jika kondisi model terpenuhi karena overfitting atau karena lain hal, maka train model akan dihentikan serta akan merollback ke versi model terbaik selama training berlangsung.
+
+```python
+class MyCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        # Ensure logs is not None and contains accuracy metrics
+        if logs and logs.get('accuracy') >= 0.95 and logs.get('val_accuracy') >= 0.95:
+            print("\nAkurasi telah mencapai >=95%!")
+            self.model.stop_training = True
+
+# Instantiate the callback
+callbacks = MyCallback()
+
+early_stopping = EarlyStopping(
+    monitor='accuracy',  # Monitor the validation loss
+    patience=5,          # Stop after 5 epochs with no improvement
+    restore_best_weights=True  # Restore the best weights
+)
+```
+
+Setelah semua configurasi pretrain model telah dilakukan, langkah berikutnya memanggil fungsi compile, beberapa configurasi tambahan diperlukan hal tersebut untuk meningkatkan optimasi model, mencegah overfitting antara lain penambahan fungsi optimizer, loss.
+
+```python
+model.compile(
+    optimizer=keras.optimizers.Adam(),
+    loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+    metrics=['accuracy'],
+)
+```
+
+Selanjutnya memulai training model dengan mengexecute fungsi fit, serta memberi nilai epoch sebagai nilai untuk jumlah iterasi training model
+
+```
+epochs = 15
+print("Fitting the top layer of the model")
+history_pretrain = model.fit(train_ds, epochs=epochs, validation_data=validation_ds, callbacks=[callbacks, early_stopping])
+```
+
+Dari hasil evaluasi terlihat model telah mencapai akurasi model serta validasi akurasi lebih dari 95%
+
+```
+Epoch 1/15
+7/7 ━━━━━━━━━━━━━━━━━━━━ 30s 4s/step - accuracy: 0.6723 - loss: 0.6647 - val_accuracy: 1.0000 - val_loss: 0.1282 
+Epoch 2/15 
+7/7 ━━━━━━━━━━━━━━━━━━━━ 0s 2s/step - accuracy: 0.9652 - loss: 0.1627 
+Akurasi telah mencapai >=95%! 
+7/7 ━━━━━━━━━━━━━━━━━━━━ 21s 3s/step - accuracy: 0.9659 - loss: 0.1593 - val_accuracy: 1.0000 - val_loss: 0.0422
+```
+

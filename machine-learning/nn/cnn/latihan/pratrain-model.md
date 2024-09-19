@@ -56,7 +56,7 @@ for i, (image, label) in enumerate(train_ds.take(9)):
     plt.axis("off")
 ```
 
-<figure><img src="../../../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
 Selanjutnya resize tinggi lebar image, tinggi lebar image ini perlu sesuai dengan value input shape ketika meracik komponen untuk train model.
 
@@ -101,7 +101,7 @@ for images, labels in train_ds.take(1):
 
 Menampilkan sample hasil augumentasi image
 
-<figure><img src="../../../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 Set batch size serta optimize loading speed ketika pelatihan model berjalan
 
@@ -223,4 +223,113 @@ Epoch 2/15
 Akurasi telah mencapai >=95%! 
 7/7 ━━━━━━━━━━━━━━━━━━━━ 21s 3s/step - accuracy: 0.9659 - loss: 0.1593 - val_accuracy: 1.0000 - val_loss: 0.0422
 ```
+
+Setelah training dilakukan, langkah selanjutnya melakukan evaluasi model, hal tersebut dilakukan untut memastikan tingkat akurasi model yg lebih riil
+
+```python
+print("Test dataset evaluation")
+model.evaluate(test_ds)
+```
+
+Hasil compile terlihat tingkat akurasi model sebesar 100%, atau model dalam mendeteksi semua test tidak ada yang keliru, kemudian loss dibawah 0.5%
+
+```
+Test dataset evaluation
+2/2 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 1.0000 - loss: 0.0418
+[0.04351438209414482, 1.0]
+```
+
+### Fine Tuning Model
+
+Fine tuning model dilakukan agar model tidak lupa dengan tugas selanjutnya, kalo diasumsikan jika model sudah bisa berjalan kemudia kita pretrain model agara model bisa berlari juga, setelah bisa berlari maka model tetep bisa berjalan juga.
+
+Fine tuning model dilakukan dengan cara unfreeze semua layer pada base model, serta mengcompile ulang model
+
+```
+# Unfreeze the base_model. Note that it keeps running in inference mode
+# since we passed `training=False` when calling it. This means that
+# the batchnorm layers will not update their batch statistics.
+# This prevents the batchnorm layers from undoing all the training
+# we've done so far.
+base_model.trainable = True
+model.summary(show_trainable=True)
+
+model.compile(
+    optimizer=keras.optimizers.Adam(1e-5),  # Low learning rate
+    loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+    metrics=['accuracy'],
+)
+
+epochs = 1
+print("Fitting the end-to-end model")
+history_finetuning = model.fit(train_ds, epochs=epochs, validation_data=validation_ds)
+```
+
+```
+Fitting the end-to-end model
+7/7 ━━━━━━━━━━━━━━━━━━━━ 128s 13s/step - accuracy: 0.8045 - loss: 0.4751 - val_accuracy: 1.0000 - val_loss: 0.0343
+```
+
+Lakukan evaluasi model kembali
+
+```python
+print("Test dataset evaluation")
+model.evaluate(test_ds)
+
+y_pred = model.predict(validation_ds)
+```
+
+Test dataset evaluation \
+2/2 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 1.0000 - loss: 0.0342 \
+2/2 ━━━━━━━━━━━━━━━━━━━━ 5s 2s/step
+
+Hasil prediksi kemudian diubah menjadi label kelas biner (0 atau 1) berdasarkan _threshold_ 0.5. Setelah itu, dilakukan pencetakan matriks kebingungan (_confusion matrix_) yang menampilkan seberapa baik model dalam memprediksi setiap kelas.&#x20;
+
+Selain itu, dilakukan juga pencetakan _classification report_ yang memberikan informasi lebih detail tentang kinerja model, termasuk presisi, recall, dan F1-Score untuk setiap kelas. Ini membantu dalam mengevaluasi secara komprehensif kinerja model pada dataset pengujian.
+
+```python
+preds_1 = y_pred.copy()
+
+# convert a 2D array with one-hot encoded labels (like [[0., 1.], [0., 1.], [1., 0.]]) to a 1D array of class labels (like [1, 1, 0])
+preds_1 = np.argmax(preds_1, axis=1)
+
+# Get validation labels
+y_true = np.concatenate([y for x, y in validation_ds], axis = 0)
+
+# Print classification report
+print(classification_report(y_true, preds_1, target_names=['horse', 'human']))
+
+# Print Confusion Matrix
+cm = pd.DataFrame(data=confusion_matrix(y_true, preds_1, labels=[0, 1]),index=['horse', 'human'], columns=["Horse", "Human"])
+sns.heatmap(cm,annot=True,fmt="d")
+```
+
+Dari _classification report_ di dapat dilihat bahwa model memiliki **akurasi sebesar 100%**, yang berarti sebagian besar dari prediksinya benar. Namun, kita perlu melihat lebih dalam untuk memahami kinerja model secara lebih rinci.
+
+Precision mengukur seberapa baik model dalam memprediksi positif secara benar. Untuk kelas "Horse", precisionnya adalah 100%, yang berarti dari semua kasus yang diprediksi sebagai "Horse", 100% di antaranya benar-benar "Horse". Untuk kelas "Human", precisionnya adalah 100%, yang berarti dari semua kasus yang diprediksi sebagai "Human", 100% di antaranya benar-benar "Human". Precision yang tinggi menunjukkan bahwa model cenderung memberikan sedikit _false positive._
+
+_Recall_ mengukur seberapa baik model dalam menemukan semua kasus yang sebenarnya positif. Untuk kelas "Horse", recall-nya adalah 100%. Ini berarti dari semua kasus "Horse" yang sebenarnya, model berhasil mengidentifikasi 100% di antaranya. Untuk kelas "Human", recall-nya adalah 100%. Ini berarti dari semua kasus "Human" yang sebenarnya, model berhasil mengidentifikasi 100% di antaranya. Recall yang tinggi menunjukkan bahwa model cenderung tidak memberikan _false negative._
+
+F1-score adalah rata-rata harmonik dari precision dan recall yang memberikan gambaran keseluruhan tentang kinerja model. F1-score untuk kelas "Horse" adalah 100%, sementara untuk kelas "Human" adalah 100%.
+
+Hasil evaluasi menunjukkan bahwa model memiliki kinerja yang baik dalam membedakan antara gambar yang menunjukkan klasifikasi human dan horse. Namun, penting untuk dipahami bahwa interpretasi hasil evaluasi ini bisa berbeda tergantung pada kebutuhan spesifik aplikasi.
+
+```
+              precision    recall  f1-score   support
+
+       horse       1.00      1.00      1.00        50
+       human       1.00      1.00      1.00        53
+
+    accuracy                           1.00       103
+   macro avg       1.00      1.00      1.00       103
+weighted avg       1.00      1.00      1.00       103
+```
+
+<figure><img src="../../../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+
+### Referensi
+
+{% embed url="https://keras.io/guides/transfer_learning/" %}
+
+{% embed url="https://learning.oreilly.com/library/view/ai-and-machine/9781492078180/ch04.html#loading_specific_versions" %}
 

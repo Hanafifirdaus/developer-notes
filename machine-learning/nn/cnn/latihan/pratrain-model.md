@@ -56,7 +56,7 @@ for i, (image, label) in enumerate(train_ds.take(9)):
     plt.axis("off")
 ```
 
-<figure><img src="../../../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 Selanjutnya resize tinggi lebar image, tinggi lebar image ini perlu sesuai dengan value input shape ketika meracik komponen untuk train model.
 
@@ -101,7 +101,7 @@ for images, labels in train_ds.take(1):
 
 Menampilkan sample hasil augumentasi image
 
-<figure><img src="../../../../.gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/image (1) (1) (1).png" alt=""><figcaption></figcaption></figure>
 
 Set batch size serta optimize loading speed ketika pelatihan model berjalan
 
@@ -325,7 +325,7 @@ Hasil evaluasi menunjukkan bahwa model memiliki kinerja yang baik dalam membedak
 weighted avg       1.00      1.00      1.00       103
 ```
 
-<figure><img src="../../../../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../../.gitbook/assets/image (8).png" alt=""><figcaption></figcaption></figure>
 
 ### Referensi
 

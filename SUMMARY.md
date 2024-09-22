@@ -17,6 +17,7 @@
     * [CNN](machine-learning/nn/cnn/README.md)
       * [Latihan](machine-learning/nn/cnn/latihan/README.md)
         * [Pretrain Model](machine-learning/nn/cnn/latihan/pratrain-model.md)
+        * [Train Model From Zero](machine-learning/nn/cnn/latihan/train-model-from-zero.md)
     * [RNN](machine-learning/nn/rnn.md)
 * [Data Science](data-science.md)
 * [Devops](devops.md)

@@ -315,7 +315,7 @@ F1-score adalah rata-rata harmonik dari precision dan recall yang memberikan gam
 
 Hasil evaluasi menunjukkan bahwa model memiliki kinerja yang baik dalam membedakan antara gambar yang menunjukkan klasifikasi human dan horse. Namun, penting untuk dipahami bahwa interpretasi hasil evaluasi ini bisa berbeda tergantung pada kebutuhan spesifik aplikasi.
 
-### Refernces
+### References
 
 {% embed url="https://learning.oreilly.com/library/view/ai-and-machine/9781492078180/ch04.html#loading_specific_versions" %}
 

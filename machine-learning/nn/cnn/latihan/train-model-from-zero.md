@@ -276,3 +276,55 @@ model.evaluate(test_ds)
 ```
 
 <figure><img src="../../../../.gitbook/assets/image (7).png" alt=""><figcaption></figcaption></figure>
+
+### Confussion Matrix
+
+```python
+preds_1 = y_pred.copy()
+
+# convert a 2D array with one-hot encoded labels (like [[0., 1.], [0., 1.], [1., 0.]]) to a 1D array of class labels (like [1, 1, 0])
+preds_1 = np.argmax(preds_1, axis=1)
+
+# Get validation labels
+y_true = np.concatenate([y for x, y in validation_ds], axis = 0)
+
+# Print classification report
+print(classification_report(y_true, preds_1, target_names=['horse', 'human']))
+
+# Print Confusion Matrix
+cm = pd.DataFrame(data=confusion_matrix(y_true, preds_1, labels=[0, 1]),index=['horse', 'human'], columns=["Horse", "Human"])
+sns.heatmap(cm,annot=True,fmt="d")
+```
+
+```
+          precision    recall  f1-score   support
+
+   horse       1.00      0.96      0.98        50
+   human       0.96      1.00      0.98        53
+
+accuracy                           0.98       103
+```
+
+<figure><img src="../../../../.gitbook/assets/image (9).png" alt=""><figcaption></figcaption></figure>
+
+_classification report_ dapat memberikan informasi lebih detail tentang kinerja model, termasuk presisi, recall, dan F1-Score untuk setiap kelas. Ini membantu dalam mengevaluasi secara komprehensif kinerja model pada dataset pengujian.
+
+_Recall_ mengukur seberapa baik model dalam menemukan semua kasus yang sebenarnya positif. Untuk kelas "Horse", recall-nya adalah 96%. Ini berarti dari semua kasus "Horse" yang sebenarnya, model berhasil mengidentifikasi 96%. Untuk kelas "Human", recall-nya adalah 100%. Ini berarti dari semua kasus "Human" yang sebenarnya, model berhasil mengidentifikasi 100%. Recall yang tinggi menunjukkan bahwa model cenderung tidak memberikan _false negative._
+
+F1-score adalah rata-rata harmonik dari precision dan recall yang memberikan gambaran keseluruhan tentang kinerja model. F1-score untuk kelas "Horse" adalah 98%, sementara untuk kelas "Human" adalah 98%.
+
+Hasil evaluasi menunjukkan bahwa model memiliki kinerja yang baik dalam membedakan antara gambar yang menunjukkan klasifikasi human dan horse. Namun, penting untuk dipahami bahwa interpretasi hasil evaluasi ini bisa berbeda tergantung pada kebutuhan spesifik aplikasi.
+
+### Refernces
+
+{% embed url="https://learning.oreilly.com/library/view/ai-and-machine/9781492078180/ch04.html#loading_specific_versions" %}
+
+{% embed url="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.classification_report.html" %}
+
+{% embed url="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html" %}
+
+{% embed url="https://keras.io/api/layers/convolution_layers/" %}
+
+{% embed url="https://www.dicoding.com/academies/185/tutorials/10134" %}
+
+{% embed url="https://www.dicoding.com/academies/185/tutorials/37538" %}
